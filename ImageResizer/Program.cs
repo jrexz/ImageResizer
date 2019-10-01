@@ -7,23 +7,33 @@ using System.Threading.Tasks;
 
 namespace ImageResizer
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             string sourcePath = Path.Combine(Environment.CurrentDirectory, "images");
             string destinationPath = Path.Combine(Environment.CurrentDirectory, "output"); ;
 
-            ImageProcess imageProcess = new ImageProcess();
-
-            imageProcess.Clean(destinationPath);
-
             Stopwatch sw = new Stopwatch();
+
+            ImageProcessOrigin imageProcessOrigin = new ImageProcessOrigin();
+            imageProcessOrigin.Clean(destinationPath);
+
             sw.Start();
-            imageProcess.ResizeImages(sourcePath, destinationPath, 2.0);
+            imageProcessOrigin.ResizeImages(sourcePath, destinationPath, 2.0);
             sw.Stop();
 
-            Console.WriteLine($"花費時間: {sw.ElapsedMilliseconds} ms");
+            Console.WriteLine($"修改前花費時間: {sw.ElapsedMilliseconds} ms");
+
+            ImageProcess imageProcess = new ImageProcess();
+            imageProcess.Clean(destinationPath);
+
+            sw.Reset();
+            sw.Start();
+            await imageProcess.ResizeImagesAsync(sourcePath, destinationPath, 2.0);
+            sw.Stop();
+
+            Console.WriteLine($"修改後花費時間: {sw.ElapsedMilliseconds} ms");
         }
     }
 }
